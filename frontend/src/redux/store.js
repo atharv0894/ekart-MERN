@@ -1,7 +1,7 @@
-import userReducer from "./userSlice";
+import userReducer from "./userSlice.js";
 import { configureStore } from '@reduxjs/toolkit';
 import { combineReducers } from 'redux';
-import productSlice from "./productSlice"; // ✅ import is present
+import productSlice from "./productSlice.js"; // ✅ import is present
 import {
   persistReducer,
   FLUSH,
