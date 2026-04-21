@@ -12,7 +12,8 @@ const Navbar = () => {
   const user = useSelector((store) => store.user.user);
   const accesstoken = localStorage.getItem("accessToken");
   const dispatch = useDispatch();
-  const cartCount = user?.cart?.length || 0;
+const cart = useSelector((store) => store.product.cart);
+const cartCount = cart?.length || 0;
 
   const handleAuthAction = async () => {
     if (user) {
