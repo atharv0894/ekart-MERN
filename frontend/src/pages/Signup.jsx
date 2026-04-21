@@ -43,7 +43,7 @@ export default function Signup() {
 
     try {
       const res = await axios.post(
-        "http://localhost:3000/api/v1/user/register",
+        "https://ekart-mern-backend.onrender.com/api/v1/user/register",
         formData,
         {
           headers: {

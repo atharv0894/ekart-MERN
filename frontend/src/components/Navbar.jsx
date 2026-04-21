@@ -18,7 +18,7 @@ const Navbar = () => {
     if (user) {
       try {
         const res = await axios.post(
-          "http://localhost:3000/api/v1/user/logout",
+          "https://ekart-mern-backend.onrender.com/api/v1/user/logout",
           {},
           { headers: { Authorization: `Bearer ${accesstoken}` } }
         );

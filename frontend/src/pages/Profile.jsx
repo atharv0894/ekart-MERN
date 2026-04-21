@@ -43,7 +43,7 @@ const Profile = () => {
     setLoading(true);
     try {
       const res = await axios.put(
-        `http://localhost:3000/api/v1/user/update-user/${userId}`,
+        `https://ekart-mern-backend.onrender.com/api/v1/user/update-user/${userId}`,
         {
           firstName: updateUser.firstName,
           lastName: updateUser.lastName,

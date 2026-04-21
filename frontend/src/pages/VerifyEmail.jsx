@@ -12,7 +12,7 @@ const  VerifyEmail = () => {
     const navigate = useNavigate()
     const VerifyEmail = async () => {
       try {
-        const res = await axios.get(`http://localhost:3000/api/v1/user/verify/${token}`)
+        const res = await axios.get(`https://ekart-mern-backend.onrender.com/api/v1/user/verify/${token}`)
         if (res.data.success) {
           setStatus("Email Verified Successfully")
           setTimeout(() => {

@@ -40,7 +40,7 @@ const Login = () => {
     setLoading(true);
     try {
       const res = await axios.post(
-        "http://localhost:3000/api/v1/user/login",
+        "https://ekart-mern-backend.onrender.com/api/v1/user/login",
         formData,
         {
           headers: {

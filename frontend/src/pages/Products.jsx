@@ -28,7 +28,7 @@ const Products = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        "http://localhost:3000/api/v1/product/get-all-products"
+        "https://ekart-mern-backend.onrender.com/api/v1/product/get-all-products"
       );
       const res = await response.json();
       // ✅ Fixed: API returns res.products directly (no res.data wrapper)
