@@ -5,6 +5,7 @@ import userRoutes from "./routes/userRoutes.js";
 import cors from "cors";
 import productRoutes from "./routes/productRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
+
 dotenv.config();
 
 const app = express();
@@ -15,7 +16,11 @@ app.use(express.json());
 app.use(cors({
   origin: process.env.FRONTEND_URL,
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
+app.options('*', cors()); // ← Add this
 
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/product", productRoutes);
