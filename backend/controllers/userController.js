@@ -231,12 +231,12 @@ export const login = async (req, res) => {
     existingUser.isLoggedIn = true;
     await existingUser.save();
 
-    const existingSession = await Session.findOne({ userID: existingUser._id });
+    const existingSession = await Session.findOne({ userId: existingUser._id });
     if (existingSession) {
-      await Session.deleteOne({ userID: existingUser._id });
+      await Session.deleteOne({ userId: existingUser._id });
     }
 
-    await Session.create({ userID: existingUser._id });
+    await Session.create({ userId: existingUser._id });
 
     const safeUser = {
       id: existingUser._id,
@@ -262,9 +262,9 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    const userId = req.id;
+    const userId = req.user._id;
 
-    await Session.deleteMany({ userID: userId });
+    await Session.deleteMany({ userId: userId });
 
     const user = await User.findById(userId);
 
