@@ -20,7 +20,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-app.options('/(.*)', cors()); // ← fixed
+// NO app.options line needed
 
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/product", productRoutes);
