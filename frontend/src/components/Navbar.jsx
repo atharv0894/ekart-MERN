@@ -1,5 +1,5 @@
-import { ShoppingCart } from "lucide-react";
-import React from "react";
+import { ShoppingCart, Menu, X } from "lucide-react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import axios from "axios";
@@ -12,8 +12,9 @@ const Navbar = () => {
   const user = useSelector((store) => store.user.user);
   const accesstoken = localStorage.getItem("accessToken");
   const dispatch = useDispatch();
-const cart = useSelector((store) => store.product.cart);
-const cartCount = cart?.length || 0;
+  const cart = useSelector((store) => store.product.cart);
+  const cartCount = cart?.length || 0;
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleAuthAction = async () => {
     if (user) {
@@ -28,7 +29,6 @@ const cartCount = cart?.length || 0;
           toast.success(res.data.message);
           localStorage.removeItem("user");
           localStorage.removeItem("accessToken");
-
         }
       } catch (error) {
         console.log(error);
@@ -37,6 +37,7 @@ const cartCount = cart?.length || 0;
     } else {
       navigate("/login");
     }
+    setMenuOpen(false);
   };
 
   return (
@@ -45,20 +46,16 @@ const cartCount = cart?.length || 0;
         {/* Logo */}
         <img src="/Ekart.png" alt="logo" className="w-[100px]" />
 
-        {/* Nav */}
-        <nav className="flex gap-8 items-center">
+        {/* Desktop Nav */}
+        <nav className="hidden md:flex gap-8 items-center">
           <ul className="flex gap-6 items-center text-lg font-semibold text-white">
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/products">Products</Link>
-            </li>
-            <li>
-              {user ? (
+            <li><Link to="/">Home</Link></li>
+            <li><Link to="/products">Products</Link></li>
+            {user && (
+              <li>
                 <Link to={`/profile/${user.id}`}>Hello, {user.firstName}</Link>
-              ) : null}
-            </li>
+              </li>
+            )}
           </ul>
 
           {/* Cart */}
@@ -71,7 +68,6 @@ const cartCount = cart?.length || 0;
             )}
           </Link>
 
-          {/* Login/Logout Button */}
           <Button
             onClick={handleAuthAction}
             className={
@@ -83,7 +79,53 @@ const cartCount = cart?.length || 0;
             {user ? "Logout" : "Login"}
           </Button>
         </nav>
+
+        {/* Mobile Right: Cart + Hamburger */}
+        <div className="flex items-center gap-4 md:hidden">
+          <Link to="/cart" className="relative text-white">
+            <ShoppingCart size={22} />
+            {cartCount > 0 && (
+              <span className="bg-red-500 text-white text-xs rounded-full absolute -top-2 -right-3 px-2">
+                {cartCount}
+              </span>
+            )}
+          </Link>
+          <button
+            className="text-white"
+            onClick={() => setMenuOpen((prev) => !prev)}
+            aria-label="Toggle menu"
+          >
+            {menuOpen ? <X size={26} /> : <Menu size={26} />}
+          </button>
+        </div>
       </div>
+
+      {/* Mobile Dropdown Menu */}
+      {menuOpen && (
+        <div className="md:hidden bg-gray-700 px-4 pb-4 flex flex-col gap-3 text-white font-semibold text-base">
+          <Link to="/" onClick={() => setMenuOpen(false)} className="py-2 border-b border-gray-500">
+            Home
+          </Link>
+          <Link to="/products" onClick={() => setMenuOpen(false)} className="py-2 border-b border-gray-500">
+            Products
+          </Link>
+          {user && (
+            <Link to={`/profile/${user.id}`} onClick={() => setMenuOpen(false)} className="py-2 border-b border-gray-500">
+              Hello, {user.firstName}
+            </Link>
+          )}
+          <button
+            onClick={handleAuthAction}
+            className={`mt-1 py-2 px-4 rounded-lg text-left ${
+              user
+                ? "bg-red-500 hover:bg-red-600"
+                : "bg-gray-800 hover:bg-gray-900"
+            }`}
+          >
+            {user ? "Logout" : "Login"}
+          </button>
+        </div>
+      )}
     </header>
   );
 };
