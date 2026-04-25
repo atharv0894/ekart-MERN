@@ -50,7 +50,7 @@ export const register = async (req, res) => {
     });
 
     const token = jwt.sign({ id: newUser._id }, process.env.SECRET_KEY, {
-      expiresIn: "10m",
+      expiresIn: "1d",
     });
 
     newUser.token = token;
@@ -156,7 +156,7 @@ export const reVerify = async (req, res) => {
     }
 
     const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
-      expiresIn: "10m",
+      expiresIn: "1d",
     });
 
     user.token = token;

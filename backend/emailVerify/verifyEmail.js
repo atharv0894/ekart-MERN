@@ -31,9 +31,11 @@ const verifyEmail = async (email, token) => {
 
     console.log("Email sent successfully");
     console.log(info.response);
+    return true;
 
   } catch (error) {
-    console.log("Email error:", error);
+    console.error("Email error:", error.message);
+    throw error;
   }
 };
 

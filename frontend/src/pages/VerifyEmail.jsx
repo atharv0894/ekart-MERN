@@ -21,7 +21,8 @@ const  VerifyEmail = () => {
         }
       } catch (error) {
         console.error(error)
-        setStatus("error")
+        const msg = error?.response?.data?.message || "Verification failed. Link may have expired."
+        setStatus(msg)
       }
     }
     useEffect(()=>{
