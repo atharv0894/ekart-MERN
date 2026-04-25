@@ -19,7 +19,6 @@ export const register = async (req, res) => {
       phone,
     } = req.body;
 
-    // ✅ Fixed: validate all required fields
     if (!firstName || !lastName || !email || !password) {
       return res.status(400).json({
         success: false,
@@ -27,9 +26,9 @@ export const register = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ email });
-
-    if (user) {
+    // Block only if a fully verified user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser && existingUser.isVerified) {
       return res.status(400).json({
         success: false,
         message: "User already exists",
@@ -38,37 +37,27 @@ export const register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await User.create({
-      firstName,
-      lastName,
-      email,
-      password: hashedPassword,
-      address,
-      city,
-      zipCode: pincode,
-      phoneNo: phone || null, // ✅ explicitly set null if not provided
-    });
-
-    const token = jwt.sign({ id: newUser._id }, process.env.SECRET_KEY, {
-      expiresIn: "1d",
-    });
-
-    newUser.token = token;
-    await newUser.save();
+    // Embed all user data in the token — no DB write yet
+    const token = jwt.sign(
+      {
+        firstName,
+        lastName,
+        email,
+        password: hashedPassword,
+        address: address || null,
+        city: city || null,
+        zipCode: pincode || null,
+        phoneNo: phone || null,
+      },
+      process.env.SECRET_KEY,
+      { expiresIn: "1d" }
+    );
 
     await verifyEmail(email, token);
 
-    const safeUser = {
-      id: newUser._id,
-      firstName: newUser.firstName,
-      lastName: newUser.lastName,
-      email: newUser.email,
-    };
-
-    res.status(201).json({
+    res.status(200).json({
       success: true,
-      message: "User registered successfully",
-      user: safeUser,
+      message: "Verification email sent. Please verify to complete signup.",
     });
   } catch (error) {
     res.status(500).json({
@@ -104,22 +93,55 @@ export const verify = async (req, res) => {
           message: "Token expired",
         });
       }
-
       return res.status(401).json({
         success: false,
         message: "Invalid token",
       });
     }
 
-    const user = await User.findById(decodedToken.id);
+    // If token has user data (new flow) — create user now
+    if (decodedToken.email && decodedToken.firstName) {
+      // Check again in case another request already created this user
+      const alreadyExists = await User.findOne({ email: decodedToken.email });
+      if (alreadyExists && alreadyExists.isVerified) {
+        return res.status(200).json({
+          success: true,
+          message: "Email already verified. Please login.",
+        });
+      }
 
+      // Create user in DB only now, after verification
+      const user = alreadyExists || await User.create({
+        firstName: decodedToken.firstName,
+        lastName: decodedToken.lastName,
+        email: decodedToken.email,
+        password: decodedToken.password,
+        address: decodedToken.address,
+        city: decodedToken.city,
+        zipCode: decodedToken.zipCode,
+        phoneNo: decodedToken.phoneNo,
+        isVerified: true,
+      });
+
+      if (alreadyExists && !alreadyExists.isVerified) {
+        alreadyExists.isVerified = true;
+        await alreadyExists.save();
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Email verified successfully. You can now login.",
+      });
+    }
+
+    // Legacy fallback: token only has id
+    const user = await User.findById(decodedToken.id);
     if (!user) {
       return res.status(404).json({
         success: false,
         message: "User not found",
       });
     }
-
     user.isVerified = true;
     await user.save();
 
