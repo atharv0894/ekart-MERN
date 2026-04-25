@@ -58,7 +58,7 @@ export default function Signup() {
       }
     } catch (error) {
       console.error(error);
-      toast.error("Signup failed");
+      toast.error(error?.response?.data?.message || "Signup failed");
     } finally {
       setLoading(false);
     }
